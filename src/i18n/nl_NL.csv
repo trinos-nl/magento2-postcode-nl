@@ -1,0 +1,8 @@
+"Housenumber","Huisnummer"
+"Housenumber addition","Toevoeging"
+"Combination does not exist.","Deze combinatie bestaat niet."
+"Manually set up address","Handmatig adres invullen"
+"Housenumber must contain numbers only.","Huisnummer mag alleen cijfers bevatten."
+"Specified postcode is too short.","De opgegeven postcode is te kort."
+"Specified postcode is too long.","De opgegeven postcode is te lang."
+"Postcode does not use format `1234AB`.","De postcode is niet in het formaat `1234AB`."

@@ -1,0 +1,27 @@
+{
+  "name": "trinos-nl/magento2-postcode-nl",
+  "version": "1.0.0",
+  "description": "Hyvä Checkout integration for Postcode.nl to validate Dutch addresses at Checkout",
+  "type": "magento2-module",
+  "require": {
+    "magento/framework": "*",
+    "hyva-themes/magento2-hyva-checkout": "*"
+  },
+  "authors": [
+    {
+      "name": "Thijs de Witt",
+      "email": "thijs@trinos.nl"
+    }
+  ],
+  "license": [
+    ""
+  ],
+  "autoload": {
+    "files": [
+      "src/registration.php"
+    ],
+    "psr-4": {
+      "Trinos\\PostcodeNL\\": "src/"
+    }
+  }
+}

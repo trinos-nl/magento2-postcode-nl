@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="entity-form.field-renderers">
+            <block name="street.text" ifconfig="postcodenl_api/advanced_config/explode_address" template="Trinos_PostcodeNL::form/field/street.phtml"/>
+            <block name="form-field.checkbox" as="checkbox" template="Trinos_PostcodeNL::form/field/checkbox.phtml"/>
+            <block name="postcodenl_manual_mode.checkbox" template="Trinos_PostcodeNL::form/field/checkbox.phtml">
+                <block name="postcodenl_manual_mode.after" as="after" template="Trinos_PostcodeNL::form/field/manual_mode_error.phtml"/>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

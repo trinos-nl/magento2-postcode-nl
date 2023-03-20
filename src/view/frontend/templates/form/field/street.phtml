@@ -1,0 +1,45 @@
+<?php
+declare(strict_types=1);
+
+use Hyva\Checkout\Model\Form\EntityFieldInterface;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magewirephp\Magewire\Component\Form as MagewireFormComponent;
+
+/** @var Template $block */
+/** @var EntityFieldInterface $field */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+/** @var MagewireFormComponent $magewire */
+
+$field = $block->getData('field');
+$form = $block->getData('form_name');
+?>
+<div class="block text-sm font-medium text-gray-700 <?= $field->isRequired() ? 'required' : 'not-required' ?>">
+    <?php if (($field->hasAncestor() && $field->getAncestor()->getId() !== $field->getId() && $field->getName()) || !$field->hasAncestor() && $field->getName()): ?>
+        <label for="<?= $escaper->escapeHtmlAttr($field->getName()) ?>">
+            <span>
+                <?= $escaper->escapeHtml(__($field->getLabel())) ?>
+            </span>
+        </label>
+    <?php endif ?>
+
+    <?= $field->getRenderer()->renderBefore($field, $form) ?>
+
+    <div class="flex items-center gap-4">
+        <input class="<?= $escaper->escapeHtmlAttr($field->getClass(['block w-full form-input grow'])) ?>"
+            <?php if ($field->hasAttributes()): ?>
+                <?= /* @noEscape */
+                $field->renderAttributes() ?>
+            <?php endif ?>
+        />
+
+        <?php if ($field->hasTooltip()): ?>
+            <?= /* @noEscape */
+            $field->getRenderer()->renderTooltip($field) ?>
+        <?php endif ?>
+    </div>
+
+    <?= $field->getRenderer()->renderAfter($field, $form) ?>
+</div>

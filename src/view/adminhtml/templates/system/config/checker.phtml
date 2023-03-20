@@ -1,0 +1,39 @@
+<?php
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Trinos\PostcodeNL\Block\System\Config\Form\Apikey\Checker;
+
+/** @var Checker $block */
+/** @var Escaper $escaper */
+?>
+<?= $block->getButtonHtml() ?>
+<span class="api_key_is_valid"></span>
+<script>
+    async function checkApi() {
+        const apikey = document.querySelector('#postcodenl_api_general_api_key').value;
+        const apisecret = document.querySelector('#postcodenl_api_general_api_secret').value;
+
+        // make above call using fetch
+        const response = await fetch(`<?= $block->getAjaxUrl() ?>?apikey=${encodeURIComponent(apikey)}&apisecret=${encodeURIComponent(apisecret)}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Data:', data)
+            document.querySelector('.api_key_is_valid').textContent = data.message;
+            document.querySelector('#postcodenl_api_general_api_key_is_valid').value = data.success ? 'yes' : 'no';
+        } else {
+            console.error('Error:', response)
+        }
+    }
+
+    document.querySelector('#check_button').addEventListener('click', event => {
+        event.preventDefault();
+        checkApi();
+    });
+</script>

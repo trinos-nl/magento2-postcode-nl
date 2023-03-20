@@ -1,0 +1,103 @@
+<?php
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+?>
+<script>
+    if (hyva && hyva.formValidation) {
+        (() => {
+            const originalFormValidation = hyva.formValidation;
+
+            hyva.formValidation = function formValidation(formElement, options) {
+                return {
+                    ...originalFormValidation(formElement, options),
+                    init() {
+                        this.toggleManualModeVisibility();
+                        window.addEventListener('magewire:loader:stop', () => {
+                            this.toggleManualModeVisibility();
+                        })
+
+                        this.$refs.country_id.addEventListener('change', (event) => {
+                            const shouldDisable = event.target.value === 'NL' && !this.$refs.postcodenl_manual_mode.checked;
+                            this.$refs.street.disabled = shouldDisable;
+                            this.$refs.city.disabled = shouldDisable;
+
+                            this.toggleManualModeVisibility();
+                        });
+                        this.$refs.postcodenl_manual_mode.addEventListener('change', (event) => {
+                            const shouldDisable = !event.target.checked && this.$refs.country_id.value === 'NL';
+                            this.$refs.street.disabled = shouldDisable;
+                            this.$refs.city.disabled = shouldDisable;
+
+                            if (shouldDisable) {
+                                this.getPostcodeInformation();
+                            }
+                        });
+                    },
+                    closest(el, selector) {
+                        let parentElement = el;
+                        while ((parentElement = parentElement.parentElement) && !((parentElement.matches || parentElement.matchesSelector).call(parentElement, selector))) ;
+                        return parentElement;
+                    },
+                    toggleManualModeVisibility() {
+                        const manualModeParent = this.closest(this.$refs.postcodenl_manual_mode, '.field-wrapper');
+                        manualModeParent.style.display = this.$refs.country_id.value !== 'NL' ? 'none' : null;
+                    },
+                    async getPostcodeInformation() {
+                        const postcode = this.$refs.postcode.value;
+                        const housenumber = this.$refs.postcodenl_housenumber.value;
+                        const housenumberAddition = this.$refs.postcodenl_housenumber_addition.value;
+
+                        if (this.$refs.postcodenl_manual_mode.checked || this.$refs.country_id.value !== 'NL') {
+                            this.$wire.save();
+                            return;
+                        }
+
+                        if (!postcode || !housenumber) {
+                            return;
+                        }
+
+                        const data = new FormData();
+                        data.append('postcode', postcode);
+                        data.append('housenumber', housenumber);
+                        data.append('housenumberAddition', housenumberAddition);
+                        const response = await fetch(`/rest/V1/postcode/information`, {
+                            method: 'POST',
+                            body: data,
+                        })
+
+                        if (response.ok) {
+                            let data = await response.json();
+                            data = JSON.parse(data);
+
+                            if (data.exception) {
+                                console.error('Exception:', data.exception)
+                                const manualModeParent = this.closest(this.$refs.postcodenl_manual_mode, '.field-wrapper');
+                                manualModeParent.querySelector('#manual_mode_error').innerText = data.exception
+                                return;
+                            }
+
+                            this.$wire.set('address.postcode', data.postcode);
+                            this.$wire.set('address.street.0', data.street);
+                            this.$wire.set('address.street.1', data.houseNumber);
+                            this.$wire.set('address.city', data.city);
+                            this.$wire.save();
+
+                            return data;
+                        } else {
+                            console.error('Error:', response)
+                        }
+                    },
+                };
+            }
+        })()
+    } else {
+        console.log(`The hyva.formValidation instance is undefined - be sure to include the block "<?= $escaper->escapeJs($block->getNameInLayout()) ?>" after "advanced-form-validation"`);
+    }
+</script>

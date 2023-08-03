@@ -1,30 +1,40 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-
-    <type name="Hyva\Checkout\Model\Form\EntityForm\EavAttributeShippingAddressForm">
-        <arguments>
-            <argument name="entityFormModifiers" xsi:type="array">
-                <item name="with_postcodecheck" xsi:type="object">\Trinos\PostcodeNL\Model\Form\EntityFormModifier\WithPostcodecheckModifier</item>
-            </argument>
-        </arguments>
-    </type>
-    <type name="Hyva\Checkout\Model\Form\EntityForm\EavAttributeBillingAddressForm">
-        <arguments>
-            <argument name="entityFormModifiers" xsi:type="array">
-                <item name="with_postcodecheck" xsi:type="object">\Trinos\PostcodeNL\Model\Form\EntityFormModifier\WithPostcodecheckModifier</item>
-            </argument>
-        </arguments>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="\Hyva\Checkout\Model\Form\EntityField\EavEntityAddress\StreetAttributeField" type="\Trinos\PostcodeNL\Model\Form\EntityField\EavEntityAddress\StreetAttributeField"/>
+    <type name="Hyva\Checkout\Model\ConfigData\HyvaThemes\Checkout">
+        <plugin name="trinos_postcodenl_sort_form_fields_mapping" type="Trinos\PostcodeNL\Plugin\SortFormFieldsMapping"/>
     </type>
 
-    <type name="Hyva\Checkout\Model\Form\EntityFormFieldFactory">
+    <type name="Hyva\Checkout\Model\Form\EntityFormFactory">
         <arguments>
-            <!-- Form API: add custom field entities global or form specific -->
-            <argument name="customFields" xsi:type="array">
-                <item name="postcode" xsi:type="string">Trinos\PostcodeNL\Model\Form\EntityField\EavEntityAddress\PostcodeAttributeField</item>
-                <item name="postcodenl_housenumber" xsi:type="string">Trinos\PostcodeNL\Model\Form\EntityField\EavEntityAddress\HousenumberAttributeField</item>
-                <item name="postcodenl_housenumber_addition" xsi:type="string">Trinos\PostcodeNL\Model\Form\EntityField\EavEntityAddress\HousenumberAdditionAttributeField</item>
-                <item name="postcodenl_manual_mode" xsi:type="string">Trinos\PostcodeNL\Model\Form\EntityField\EavEntityAddress\ManualModeAttributeField</item>
+            <argument name="elements" xsi:type="array">
+                <item name="postcodenl_manual_mode" xsi:type="string">
+                    \Trinos\PostcodeNL\Model\Form\EntityField\EavEntityAddress\ManualModeAttributeField
+                </item>
             </argument>
         </arguments>
     </type>
+
+    <type name="Hyva\Checkout\Model\Form\AbstractEntityForm">
+        <arguments>
+            <argument name="entityFormModifiers" xsi:type="array">
+                <item name="with_postcodecheck" sortOrder="501" xsi:type="object">
+                    \Trinos\PostcodeNL\Model\Form\EntityFormModifier\WithPostcodecheckModifier
+                </item>
+                <item name="with_wire_target_fix" sortOrder="501" xsi:type="object">
+                    \Trinos\PostcodeNL\Model\Form\EntityFormModifier\WithWireTargetFixModifier
+                </item>
+            </argument>
+        </arguments>
+    </type>
+<!--    <type name="Hyva\Checkout\Model\Form\EntityForm\EavAttributeBillingAddressForm">-->
+<!--        <arguments>-->
+<!--            <argument name="entityFormModifiers" xsi:type="array">-->
+<!--                <item name="with_postcodecheck" sortOrder="200" xsi:type="object">-->
+<!--                    \Trinos\PostcodeNL\Model\Form\EntityFormModifier\WithPostcodecheckModifier-->
+<!--                </item>-->
+<!--            </argument>-->
+<!--        </arguments>-->
+<!--    </type>-->
 </config>

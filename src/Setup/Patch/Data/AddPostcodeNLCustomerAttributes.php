@@ -3,8 +3,6 @@
 namespace Trinos\PostcodeNL\Setup\Patch\Data;
 
 use Magento\Customer\Api\AddressMetadataInterface;
-use Magento\Customer\Api\CustomerMetadataInterface;
-use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\ResourceModel\Attribute;
 use Magento\Eav\Model\Config;
 use Magento\Eav\Setup\EavSetup;
@@ -84,58 +82,6 @@ class AddPostcodeNLCustomerAttributes implements DataPatchInterface
         $eavSetup = $this->eavSetupFactory->create(['setup' => $this->moduleDataSetup]);
 
         $eavSetup->addAttribute(
-            Customer::ENTITY,
-            'postcodenl_housenumber',
-            [
-                'input' => 'text',
-                'is_visible_in_grid' => false,
-                'visible' => false,
-                'user_defined' => false,
-                'is_filterable_in_grid' => false,
-                'system' => false,
-                'label' => 'Housenumber',
-                'source' => null,
-                'position' => 10,
-                'type' => 'text',
-                'is_used_in_grid' => false,
-                'required' => false,
-            ]
-        );
-
-        $eavSetup->addAttribute(
-            Customer::ENTITY,
-            'postcodenl_housenumber_addition',
-            [
-                'input' => 'text',
-                'is_visible_in_grid' => false,
-                'visible' => false,
-                'user_defined' => false,
-                'is_filterable_in_grid' => false,
-                'system' => false,
-                'label' => 'Housenumber addition',
-                'source' => null,
-                'position' => 10,
-                'type' => 'text',
-                'is_used_in_grid' => false,
-                'required' => false,
-            ]
-        );
-
-        $eavSetup->addAttributeToSet(
-            CustomerMetadataInterface::ENTITY_TYPE_CUSTOMER,
-            CustomerMetadataInterface::ATTRIBUTE_SET_ID_CUSTOMER,
-            'Default',
-            'postcodenl_housenumber'
-        );
-
-        $eavSetup->addAttributeToSet(
-            CustomerMetadataInterface::ENTITY_TYPE_CUSTOMER,
-            CustomerMetadataInterface::ATTRIBUTE_SET_ID_CUSTOMER,
-            'Default',
-            'postcodenl_housenumber_addition'
-        );
-
-        $eavSetup->addAttribute(
             AddressMetadataInterface::ENTITY_TYPE_ADDRESS,
             'postcodenl_manual_mode',
             [
@@ -156,7 +102,6 @@ class AddPostcodeNLCustomerAttributes implements DataPatchInterface
         );
 
         $customAttribute = $this->eavConfig->getAttribute(AddressMetadataInterface::ENTITY_TYPE_ADDRESS, 'postcodenl_manual_mode');
-
         $customAttribute->setData(
             'used_in_forms',
             ['adminhtml_customer_address', 'customer_address_edit', 'customer_register_address'], //list of forms where you want to display the custom attribute

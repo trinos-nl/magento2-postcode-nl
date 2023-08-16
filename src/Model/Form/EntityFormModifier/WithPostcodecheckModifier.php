@@ -112,7 +112,7 @@ class WithPostcodecheckModifier implements EntityFormModifierInterface
         }
     }
 
-    public function postcodeCheck(EntityFormInterface $form, EntityFieldInterface $field, MagewireAddressFormInterface $formComponent): void
+    public function postcodeCheck(EntityFormInterface $form, MagewireAddressFormInterface $formComponent): void
     {
         $address = $formComponent->getAddress();
         $manualMode = $form->getField(self::KEY_MANUAL_MODE);

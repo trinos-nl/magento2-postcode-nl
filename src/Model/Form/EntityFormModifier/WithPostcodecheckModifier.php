@@ -148,7 +148,9 @@ class WithPostcodecheckModifier implements EntityFormModifierInterface
         $addition->setValue($response['houseNumberAddition']);
 
         if (count($response['houseNumberAdditions']) > 1) {
-            $addition->setOptions($response['houseNumberAdditions']);
+            // The option key should be the same as the label.
+            $options = array_combine($response['houseNumberAdditions'], $response['houseNumberAdditions']);
+            $addition->setOptions($options);
         }
 
         $address[AddressInterface::KEY_POSTCODE] = $response['postcode'];

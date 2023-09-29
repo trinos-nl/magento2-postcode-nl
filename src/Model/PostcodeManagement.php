@@ -26,7 +26,7 @@ class PostcodeManagement implements PostcodeManagementInterface
      * @param string $houseNumberAddition The housenumber addition you would like to get information for.
      * @return string
      */
-    public function getPostcodeInformation(string $postcode, string $housenumber, string $housenumberAddition = ''): string
+    public function getPostcodeInformation(string $postcode, string|int $housenumber, string $housenumberAddition = ''): string
     {
         $client = new Client([
             'base_uri' => self::API_URL,

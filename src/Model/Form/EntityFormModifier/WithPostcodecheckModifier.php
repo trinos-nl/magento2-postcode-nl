@@ -123,8 +123,8 @@ class WithPostcodecheckModifier implements EntityFormModifierInterface
         $postcode = $form->getField(AddressInterface::KEY_POSTCODE);
         $city = $form->getField(AddressInterface::KEY_CITY);
         $street = $form->getField(AddressInterface::KEY_STREET);
-        $housenumber = $street->getRelatives()[1];
-        $addition = $street->getRelatives()[2];
+        $housenumber = $street->getRelatives()[1] ?? null;
+        $addition = $street->getRelatives()[2] ?? null;
 
         if (!$postcode || !$postcode->getValue() || !$housenumber || !$housenumber->getValue()) {
             return;
@@ -133,7 +133,7 @@ class WithPostcodecheckModifier implements EntityFormModifierInterface
         $response = json_decode($this->postcodeManagement->getPostcodeInformation(
             $postcode->getValue(),
             $housenumber->getValue(),
-            $addition->getValue(),
+            $addition ? $addition->getValue() : '',
         ), true);
 
         if (isset($response['exception'])) {
@@ -145,9 +145,11 @@ class WithPostcodecheckModifier implements EntityFormModifierInterface
         $street->setValue($response['street']);
         $city->setValue($response['city']);
         $housenumber->setValue($response['houseNumber']);
-        $addition->setValue($response['houseNumberAddition']);
+        if ($addition) {
+            $addition->setValue($response['houseNumberAddition']);
+        }
 
-        if (count($response['houseNumberAdditions']) > 1) {
+        if (count($response['houseNumberAdditions']) > 1 && $addition) {
             // The option key should be the same as the label.
             $options = array_combine($response['houseNumberAdditions'], $response['houseNumberAdditions']);
             $addition->setOptions($options);

@@ -9,9 +9,9 @@ Postcode.nl integration for Hyvä Checkout.
     composer config repositories.trinos-nl/magento2-postcode-nl git git@github.com:trinos-nl/magento2-postcode-nl.git
     ```
 
-2. Require the `trinos-nl/magento2-postcode-nl` packages using the `dev-main` branch version:
+2. Require the `trinos-nl/magento2-postcode-nl` package:
     ```sh
-    composer require --prefer-source 'trinos-nl/magento2-postcode-nl:dev-main'
+    composer require trinos-nl/magento2-postcode-nl
     ```
 
 3. Run `bin/magento setup:upgrade`

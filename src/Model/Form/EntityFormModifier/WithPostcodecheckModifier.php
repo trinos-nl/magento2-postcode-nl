@@ -57,12 +57,12 @@ class WithPostcodecheckModifier implements EntityFormModifierInterface
         $country = $form->getField(AddressInterface::KEY_COUNTRY_ID)->getValue();
         $manualMode = $form->getField(self::KEY_MANUAL_MODE);
         $street = $form->getField(AddressInterface::KEY_STREET);
-        $houseNumber = $street->getRelatives()[1];
-        $addition = $street->getRelatives()[2];
+        $houseNumber = $street->getRelatives()[1] ?? null;
+        $addition = $street->getRelatives()[2] ?? null;
         $city = $form->getField(AddressInterface::KEY_CITY);
 
-        $houseNumber->setAttribute('autocomplete', 'address-line2');
-        $addition->setAttribute('autocomplete', 'address-line3');
+        $houseNumber?->setAttribute('autocomplete', 'address-line2');
+        $addition?->setAttribute('autocomplete', 'address-line3');
 
         if ($country !== 'NL') {
             if ($manualMode) {
@@ -83,13 +83,13 @@ class WithPostcodecheckModifier implements EntityFormModifierInterface
         }
         $postcode = $form->getField(AddressInterface::KEY_POSTCODE);
         $street = $form->getField(AddressInterface::KEY_STREET);
-        $housenumber = $street->getRelatives()[1];
-        $addition = $street->getRelatives()[2];
+        $housenumber = $street->getRelatives()[1] ?? null;
+        $addition = $street->getRelatives()[2] ?? null;
 
         $response = json_decode($this->postcodeManagement->getPostcodeInformation(
             $postcode->getValue() ?? '',
-            $housenumber->getValue() ?? '',
-            $addition->getValue() ?? '',
+            $housenumber?->getValue() ?? '',
+            $addition?->getValue() ?? '',
         ), true);
 
         if (isset($response['exception'])) {
@@ -101,7 +101,7 @@ class WithPostcodecheckModifier implements EntityFormModifierInterface
         if (count($response['houseNumberAdditions']) > 1) {
             // The option key should be the same as the label.
             $options = array_combine($response['houseNumberAdditions'], $response['houseNumberAdditions']);
-            $addition->setOptions($options);
+            $addition?->setOptions($options);
         }
 
         return $response;
@@ -112,8 +112,8 @@ class WithPostcodecheckModifier implements EntityFormModifierInterface
         $manualMode = $form->getField(self::KEY_MANUAL_MODE);
         $postcode = $form->getField(AddressInterface::KEY_POSTCODE);
         $street = $form->getField(AddressInterface::KEY_STREET);
-        $housenumber = $street->getRelatives()[1];
-        $addition = $street->getRelatives()[2];
+        $housenumber = $street->getRelatives()[1] ?? null;
+        $addition = $street->getRelatives()[2] ?? null;
         $city = $form->getField(AddressInterface::KEY_CITY);
 
         if ($manualMode && $manualMode->getValue()) {
@@ -137,8 +137,8 @@ class WithPostcodecheckModifier implements EntityFormModifierInterface
         $manualMode = $form->getField(self::KEY_MANUAL_MODE);
         $postcode = $form->getField(AddressInterface::KEY_POSTCODE);
         $street = $form->getField(AddressInterface::KEY_STREET);
-        $housenumber = $street->getRelatives()[1];
-        $addition = $street->getRelatives()[2];
+        $housenumber = $street->getRelatives()[1] ?? null;
+        $addition = $street->getRelatives()[2] ?? null;
 
         foreach ([$postcode, $housenumber, $addition, $manualMode] as $field) {
             if ($field) {
@@ -154,8 +154,8 @@ class WithPostcodecheckModifier implements EntityFormModifierInterface
         $postcode = $form->getField(AddressInterface::KEY_POSTCODE);
         $street = $form->getField(AddressInterface::KEY_STREET);
         $city = $form->getField(AddressInterface::KEY_CITY);
-        $housenumber = $street->getRelatives()[1];
-        $addition = $street->getRelatives()[2];
+        $housenumber = $street->getRelatives()[1] ?? null;
+        $addition = $street->getRelatives()[2] ?? null;
 
         if (!$response || isset($response['exception'])) {
             $street->setValue('');
@@ -166,8 +166,8 @@ class WithPostcodecheckModifier implements EntityFormModifierInterface
         $postcode->setValue($response['postcode']);
         $street->setValue($response['street']);
         $city->setValue($response['city']);
-        $housenumber->setValue($response['houseNumber']);
-        $addition->setValue($response['houseNumberAddition']);
+        $housenumber?->setValue($response['houseNumber']);
+        $addition?->setValue($response['houseNumberAddition']);
     }
 
     public function explodeStreetRows(EntityFormInterface $form): void

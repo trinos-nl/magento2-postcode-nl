@@ -2,8 +2,8 @@
 
 namespace Trinos\PostcodeNL\Model\Form\EntityFormModifier;
 
+use Hyva\Checkout\Magewire\Checkout\AddressView\AbstractMagewireAddressForm;
 use Hyva\Checkout\Magewire\Checkout\AddressView\MagewireAddressFormInterface;
-use Hyva\Checkout\Model\Form\EntityFieldInterface;
 use Hyva\Checkout\Model\Form\EntityFormInterface;
 use Hyva\Checkout\Model\Form\EntityFormModifierInterface;
 use Magento\Quote\Api\Data\AddressInterface;
@@ -32,13 +32,14 @@ class WithPostcodecheckModifier implements EntityFormModifierInterface
         );
 
         $form->registerModificationListener(
-            'postcodenlShippingUpdated',
-            'form:shipping:updated',
-            [$this, 'postcodeCheck']
+            'manualModeUpdated',
+            'form:build:magewire',
+            [$this, 'validatePostcode']
         );
+
         $form->registerModificationListener(
-            'postcodenBillingUpdated',
-            'form:billing:updated',
+            'postcodenlShippingUpdated',
+            'form:updated',
             [$this, 'postcodeCheck']
         );
 
@@ -63,13 +64,47 @@ class WithPostcodecheckModifier implements EntityFormModifierInterface
         $houseNumber->setAttribute('autocomplete', 'address-line2');
         $addition->setAttribute('autocomplete', 'address-line3');
 
-        if ($country !== 'NL' && $manualMode) {
-            $form->removeField($manualMode);
+        if ($country !== 'NL') {
+            if ($manualMode) {
+                $form->removeField($manualMode);
+            }
             $street->enable();
             $city->enable();
         } else {
             $this->onManualModeUpdated($form);
         }
+    }
+
+    public function validatePostcode(EntityFormInterface $form): ?array
+    {
+        $manualMode = $form->getField(self::KEY_MANUAL_MODE);
+        if (!$manualMode || $manualMode->getValue()) {
+            return null;
+        }
+        $postcode = $form->getField(AddressInterface::KEY_POSTCODE);
+        $street = $form->getField(AddressInterface::KEY_STREET);
+        $housenumber = $street->getRelatives()[1];
+        $addition = $street->getRelatives()[2];
+
+        $response = json_decode($this->postcodeManagement->getPostcodeInformation(
+            $postcode->getValue() ?? '',
+            $housenumber->getValue() ?? '',
+            $addition->getValue() ?? '',
+        ), true);
+
+        if (isset($response['exception'])) {
+            $manualMode->setAttribute('data-msg-magewire', $response['exception']);
+            $manualMode->setAttribute('data-magewire-is-valid', '0');
+            return $response;
+        }
+
+        if (count($response['houseNumberAdditions']) > 1) {
+            // The option key should be the same as the label.
+            $options = array_combine($response['houseNumberAdditions'], $response['houseNumberAdditions']);
+            $addition->setOptions($options);
+        }
+
+        return $response;
     }
 
     public function onManualModeUpdated(EntityFormInterface $form): void
@@ -114,53 +149,25 @@ class WithPostcodecheckModifier implements EntityFormModifierInterface
 
     public function postcodeCheck(EntityFormInterface $form, MagewireAddressFormInterface $formComponent): void
     {
-        $address = $formComponent->getAddress();
-        $manualMode = $form->getField(self::KEY_MANUAL_MODE);
-        if (!$manualMode || $address[self::KEY_MANUAL_MODE]) {
-            return;
-        }
+        $response = $this->validatePostcode($form);
 
         $postcode = $form->getField(AddressInterface::KEY_POSTCODE);
-        $city = $form->getField(AddressInterface::KEY_CITY);
         $street = $form->getField(AddressInterface::KEY_STREET);
+        $city = $form->getField(AddressInterface::KEY_CITY);
         $housenumber = $street->getRelatives()[1];
         $addition = $street->getRelatives()[2];
 
-        if (!$postcode || !$postcode->getValue() || !$housenumber || !$housenumber->getValue()) {
+        if (!$response || isset($response['exception'])) {
+            $street->setValue('');
+            $city->setValue('');
             return;
         }
 
-        $response = json_decode($this->postcodeManagement->getPostcodeInformation(
-            $postcode->getValue(),
-            $housenumber->getValue(),
-            $addition->getValue(),
-        ), true);
-
-        if (isset($response['exception'])) {
-            $formComponent->error(self::KEY_MANUAL_MODE, $response['exception']);
-            return;
-        }
-        $formComponent->clearErrors();
         $postcode->setValue($response['postcode']);
         $street->setValue($response['street']);
         $city->setValue($response['city']);
         $housenumber->setValue($response['houseNumber']);
         $addition->setValue($response['houseNumberAddition']);
-
-        if (count($response['houseNumberAdditions']) > 1) {
-            // The option key should be the same as the label.
-            $options = array_combine($response['houseNumberAdditions'], $response['houseNumberAdditions']);
-            $addition->setOptions($options);
-        }
-
-        $address[AddressInterface::KEY_POSTCODE] = $response['postcode'];
-        $address[AddressInterface::KEY_STREET] = [
-            $response['street'],
-            $response['houseNumber'],
-            $response['houseNumberAddition'],
-        ];
-        $address[AddressInterface::KEY_CITY] = $response['city'];
-        $formComponent->address = $address;
     }
 
     public function explodeStreetRows(EntityFormInterface $form): void

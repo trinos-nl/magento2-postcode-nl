@@ -6,7 +6,7 @@ Postcode.nl integration for Hyvä Checkout.
 
 1. Add the checkout repository to the Magento `composer.json`
     ```sh
-    composer config repositories.trinos-nl/magento2-postcode-nl git git@github.com:trinos-nl/magento2-postcode-nl.git
+    composer config repositories.trinos-nl/magento2-postcode-nl vcs https://github.com/trinos-nl/magento2-postcode-nl.git
     ```
 
 2. Require the `trinos-nl/magento2-postcode-nl` package:

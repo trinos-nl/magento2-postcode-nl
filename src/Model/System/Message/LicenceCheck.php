@@ -6,13 +6,14 @@ use Experius\Postcode\Helper\Data;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Notification\MessageInterface;
 use Magento\Store\Model\ScopeInterface;
+use Trinos\PostcodeNL\Model\Config\PostcodeNL as PostcodeNLConfig;
 
 class LicenceCheck implements MessageInterface
 {
     const MESSAGE_IDENTITY = 'postcodenl_system_message';
 
     public function __construct(
-        protected ScopeConfigInterface $scopeConfig
+        protected PostcodeNLConfig $postcodeNLConfig
     ) {
     }
 
@@ -23,7 +24,7 @@ class LicenceCheck implements MessageInterface
 
     public function isDisplayed(): bool
     {
-        $keyIsValid = $this->scopeConfig->getValue('postcodenl_api/general/api_key_is_valid', ScopeInterface::SCOPE_STORE);
+        $keyIsValid = $this->postcodeNLConfig->isValidApiKey();
         return !($keyIsValid == 'yes');
     }
 

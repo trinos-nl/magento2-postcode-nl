@@ -81,6 +81,12 @@ class WithPostcodecheckModifier implements EntityFormModifierInterface
         if (!$manualMode || $manualMode->getValue()) {
             return null;
         }
+
+        $countryId = $form->getField(AddressInterface::KEY_COUNTRY_ID);
+        if ($countryId->getValue() !== 'NL') {
+            return null;
+        }
+
         $postcode = $form->getField(AddressInterface::KEY_POSTCODE);
         $street = $form->getField(AddressInterface::KEY_STREET);
         $housenumber = $street->getRelatives()[1] ?? null;

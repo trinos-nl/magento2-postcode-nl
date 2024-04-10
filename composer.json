@@ -13,8 +13,8 @@
       "email": "thijs@trinos.nl"
     }
   ],
-  "license": [
-    ""
+ "license": [
+    "OSL-3.0"
   ],
   "autoload": {
     "files": [

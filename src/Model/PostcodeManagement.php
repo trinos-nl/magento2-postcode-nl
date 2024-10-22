@@ -4,6 +4,7 @@ namespace Trinos\PostcodeNL\Model;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Magento\Framework\App\CacheInterface;
 use Trinos\PostcodeNL\Api\PostcodeManagementInterface;
 use Trinos\PostcodeNL\Model\Config\PostcodeNL as PostcodeNLConfig;
 
@@ -17,6 +18,7 @@ class PostcodeManagement implements PostcodeManagementInterface
 
     public function __construct(
         private readonly PostcodeNLConfig $postcodeNLConfig,
+        private readonly CacheInterface $cache,
     ) {
     }
 
@@ -28,6 +30,12 @@ class PostcodeManagement implements PostcodeManagementInterface
      */
     public function getPostcodeInformation(string $postcode, string|int $housenumber, string $housenumberAddition = ''): string
     {
+        $cacheKey = $this->getCacheKey($postcode, $housenumber, $housenumberAddition);
+        $content = $this->cache->load($cacheKey);
+        if ($content) {
+            return $content;
+        }
+
         $client = new Client([
             'base_uri' => self::API_URL,
             'timeout' => 3.0,
@@ -49,9 +57,20 @@ class PostcodeManagement implements PostcodeManagementInterface
             if (isset($response['exception'])) {
                 $response['exception'] = __($response['exception']);
             }
-            return json_encode($response);
+            $content = json_encode($response);
+            $this->cache->save($content, $cacheKey, [], 60);
+
+            return $content;
         }
 
-        return $response->getBody()->getContents();
+        $content = $response->getBody()->getContents();
+        $this->cache->save($content, $cacheKey, [], 86400);
+
+        return $content;
     }
+
+    private function getCacheKey(string $postcode, string|int $housenumber, string $housenumberAddition = ''): string
+    {
+        return md5(rawurlencode($postcode) . rawurlencode($housenumber) . rawurlencode($housenumberAddition));
+        }
 }

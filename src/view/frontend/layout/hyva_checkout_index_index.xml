@@ -1,17 +1,5 @@
 <?xml version="1.0"?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceBlock name="entity-form.field-renderers">
-            <block name="form-field.street" as="street" template="Trinos_PostcodeNL::form/field/street.phtml"/>
-            <block name="form-field.postcode" as="postcode">
-                <block name="form-field.postcode.loading-indicator" as="after" template="Trinos_PostcodeNL::form/field/loading-indicator.phtml"/>
-            </block>
-            <block name="form-field.street.1" as="street.1">
-                <block name="form-field.street.1.loading-indicator" as="after" template="Trinos_PostcodeNL::form/field/loading-indicator.phtml"/>
-            </block>
-            <block name="form-field.street.2" as="street.2">
-                <block name="form-field.street.2.loading-indicator" as="after" template="Trinos_PostcodeNL::form/field/loading-indicator.phtml"/>
-            </block>
-        </referenceBlock>
     </body>
 </page>

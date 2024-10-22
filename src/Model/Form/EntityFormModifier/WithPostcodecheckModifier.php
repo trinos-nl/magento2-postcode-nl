@@ -122,6 +122,8 @@ class WithPostcodecheckModifier implements EntityFormModifierInterface
         $addition = $street->getRelatives()[2] ?? null;
         $city = $form->getField(AddressInterface::KEY_CITY);
 
+        $postcode?->setValidationRule('postcode');
+
         if ($manualMode && $manualMode->getValue()) {
             $street->enable();
             $city->enable();

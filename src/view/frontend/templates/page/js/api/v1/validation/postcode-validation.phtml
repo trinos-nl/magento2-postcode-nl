@@ -1,0 +1,29 @@
+<?php
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+?>
+<script>
+    'use strict';
+    (() => {
+        document.addEventListener('DOMContentLoaded', () => {
+            hyva && hyva.formValidation && hyva.formValidation.addRule('postcode', function (value, options, field, context) {
+                const form = field.element.form;
+                const country = form.querySelector('[name="country_id"]')?.value;
+                switch (country) {
+                    case 'NL':
+                        return /^\d{4}\s?[A-Za-z]{2}$/.test(value) || '<?= $escaper->escapeJs(__('Please enter a valid zip code.')) ?>';
+                    default:
+                        return true;
+                }
+            });
+        })
+    })();
+</script>

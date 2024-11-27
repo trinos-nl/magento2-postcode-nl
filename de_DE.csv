@@ -1,0 +1,8 @@
+"Housenumber","Hausnummer"
+"Housenumber addition","Zusatz"
+"Combination does not exist.","Kombination existiert nicht."
+"Manually set up address","Adresse manuell einrichten"
+"Housenumber must contain numbers only.","Hausnummer darf nur Zahlen enthalten."
+"Specified postcode is too short.","Angegebene Postleitzahl ist zu kurz."
+"Specified postcode is too long.","Angegebene Postleitzahl ist zu lang."
+"Postcode does not use format `1234AB`.","Postleitzahl verwendet nicht das Format `12345`."

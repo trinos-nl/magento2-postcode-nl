@@ -35,9 +35,9 @@ class WithWireTargetFixModifier implements EntityFormModifierInterface
      */
     public function fixWireTargetAttribute(
         AbstractMagewireAddressForm $component,
-        EntityFormInterface         $form,
-        EntityFieldInterface        $ancestor = null,
-        EntityFieldInterface        $root = null
+        EntityFormInterface $form,
+        ?EntityFieldInterface $ancestor = null,
+        ?EntityFieldInterface $root = null
     ): void {
         if ($ancestor === null && $root === null) {
             if (!array_key_exists(FormInterface::ADDRESS_PROPERTY, $component->getPublicProperties())) {
